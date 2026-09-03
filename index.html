@@ -52,15 +52,38 @@
             background: rgba(0, 0, 0, 0.25);
             padding: 12px 20px;
             border-radius: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 1.05rem;
             font-weight: 600;
+        }
+
+        .timer-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-box.urgente {
+            background: #ef4444;
+            animation: pulse 0.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .question {
             font-size: 2.3rem;
             font-weight: 700;
-            margin: 20px 0 30px;
+            margin: 15px 0 25px;
             letter-spacing: 1px;
         }
 
@@ -135,29 +158,12 @@
             color: white;
         }
 
-        .btn-facil {
-            background: #10b981;
-        }
-        .btn-facil:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
-
-        .btn-medio {
-            background: #f59e0b;
-        }
-        .btn-medio:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-        }
-
-        .btn-dificil {
-            background: #ef4444;
-        }
-        .btn-dificil:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
+        .btn-facil { background: #10b981; }
+        .btn-facil:hover { background: #059669; transform: translateY(-2px); }
+        .btn-medio { background: #f59e0b; }
+        .btn-medio:hover { background: #d97706; transform: translateY(-2px); }
+        .btn-dificil { background: #ef4444; }
+        .btn-dificil:hover { background: #dc2626; transform: translateY(-2px); }
 
         .feedback {
             font-size: 1.15rem;
@@ -166,9 +172,7 @@
             margin-bottom: 12px;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         .final-score {
             font-size: 3.2rem;
@@ -199,44 +203,34 @@
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 28px 18px;
-            }
-            .question {
-                font-size: 1.9rem;
-            }
-            .option {
-                font-size: 1.1rem;
-                padding: 14px 8px;
-            }
+            .container { padding: 28px 18px; }
+            .question { font-size: 1.9rem; }
+            .option { font-size: 1.1rem; padding: 14px 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-
-        <!-- Tela Inicial / Escolha de Dificuldade -->
         <div id="start-screen">
             <h1>🧮 Jogo de Matemática</h1>
             <p class="subtitle">Escolha o nível de dificuldade</p>
 
             <button class="btn-dificuldade btn-facil" onclick="startGame('facil')">
                 🟢 Fácil
-                <div class="descricao-nivel">Números pequenos • Soma e Subtração</div>
+                <div class="descricao-nivel">15 segundos • Soma e Subtração</div>
             </button>
 
             <button class="btn-dificuldade btn-medio" onclick="startGame('medio')">
                 🟡 Médio
-                <div class="descricao-nivel">Números médios • Todas as operações</div>
+                <div class="descricao-nivel">12 segundos • Todas as operações</div>
             </button>
 
             <button class="btn-dificuldade btn-dificil" onclick="startGame('dificil')">
                 🔴 Difícil
-                <div class="descricao-nivel">Números grandes • Multiplicação e Divisão</div>
+                <div class="descricao-nivel">10 segundos • Multiplicação e Divisão</div>
             </button>
         </div>
 
-        <!-- Tela do Jogo -->
         <div id="game-screen" class="hidden">
             <div class="nivel-atual" id="nivel-texto">Nível: Médio</div>
 
@@ -245,13 +239,15 @@
                 <div>Pontos: <span id="score">0</span></div>
             </div>
 
+            <div class="timer-box" id="timer-box">
+                ⏱️ <span id="timer">15</span>s
+            </div>
+
             <div class="question" id="question-text">5 + 3 = ?</div>
             <div class="feedback" id="feedback"></div>
-
             <div class="options" id="options"></div>
         </div>
 
-        <!-- Tela Final -->
         <div id="end-screen" class="hidden">
             <h1>Fim de Jogo!</h1>
             <div class="nivel-atual" id="nivel-final">Nível: Médio</div>
@@ -267,12 +263,20 @@
         let currentQuestion = 0;
         let correctAnswer = 0;
         let dificuldade = 'medio';
+        let tempoRestante = 15;
+        let timerInterval = null;
         const totalQuestions = 10;
 
         const nomesNivel = {
             facil: '🟢 Fácil',
             medio: '🟡 Médio',
             dificil: '🔴 Difícil'
+        };
+
+        const tempoPorNivel = {
+            facil: 15,
+            medio: 12,
+            dificil: 10
         };
 
         function startGame(nivel) {
@@ -295,12 +299,59 @@
         }
 
         function voltarInicio() {
+            pararTimer();
             document.getElementById('end-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('start-screen').classList.remove('hidden');
         }
 
+        function iniciarTimer() {
+            pararTimer();
+            tempoRestante = tempoPorNivel[dificuldade];
+            document.getElementById('timer').textContent = tempoRestante;
+            document.getElementById('timer-box').classList.remove('urgente');
+
+            timerInterval = setInterval(() => {
+                tempoRestante--;
+                document.getElementById('timer').textContent = tempoRestante;
+
+                if (tempoRestante <= 5) {
+                    document.getElementById('timer-box').classList.add('urgente');
+                }
+
+                if (tempoRestante <= 0) {
+                    pararTimer();
+                    tempoEsgotado();
+                }
+            }, 1000);
+        }
+
+        function pararTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function tempoEsgotado() {
+            const allButtons = document.querySelectorAll('.option');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            allButtons.forEach(btn => {
+                if (parseInt(btn.textContent) === correctAnswer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            document.getElementById('feedback').textContent = '⏰ Tempo esgotado! A resposta era ' + correctAnswer;
+            document.getElementById('feedback').style.color = '#fca5a5';
+
+            setTimeout(nextQuestion, 1300);
+        }
+
         function nextQuestion() {
+            pararTimer();
+
             if (currentQuestion >= totalQuestions) {
                 endGame();
                 return;
@@ -314,7 +365,6 @@
             document.getElementById('question-text').textContent = question.text;
             correctAnswer = question.answer;
 
-            // Gera opções
             let options = [correctAnswer];
             while (options.length < 4) {
                 let wrong = correctAnswer + Math.floor(Math.random() * 17) - 8;
@@ -334,15 +384,15 @@
                 btn.onclick = () => checkAnswer(btn, opt);
                 optionsContainer.appendChild(btn);
             });
+
+            iniciarTimer();
         }
 
         function generateQuestion() {
             let a, b, answer, text, op;
 
             if (dificuldade === 'facil') {
-                // Fácil: só + e -, números pequenos
                 op = Math.random() < 0.6 ? '+' : '-';
-
                 if (op === '+') {
                     a = Math.floor(Math.random() * 15) + 1;
                     b = Math.floor(Math.random() * 15) + 1;
@@ -356,10 +406,8 @@
                 }
             }
             else if (dificuldade === 'medio') {
-                // Médio: todas as operações
                 const ops = ['+', '-', '×', '÷'];
                 op = ops[Math.floor(Math.random() * ops.length)];
-
                 if (op === '+') {
                     a = Math.floor(Math.random() * 40) + 10;
                     b = Math.floor(Math.random() * 40) + 10;
@@ -383,10 +431,8 @@
                 }
             }
             else {
-                // Difícil: números maiores + mais × e ÷
                 const ops = ['+', '-', '×', '×', '÷', '÷'];
                 op = ops[Math.floor(Math.random() * ops.length)];
-
                 if (op === '+') {
                     a = Math.floor(Math.random() * 80) + 40;
                     b = Math.floor(Math.random() * 80) + 40;
@@ -409,11 +455,12 @@
                     text = a + ' ÷ ' + b + ' = ?';
                 }
             }
-
             return { text, answer };
         }
 
         function checkAnswer(button, selected) {
+            pararTimer();
+
             const allButtons = document.querySelectorAll('.option');
             allButtons.forEach(btn => btn.disabled = true);
 
@@ -439,6 +486,7 @@
         }
 
         function endGame() {
+            pararTimer();
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.remove('hidden');
 
@@ -446,17 +494,11 @@
             document.getElementById('nivel-final').textContent = 'Nível: ' + nomesNivel[dificuldade];
 
             let message = '';
-            if (score === 10) {
-                message = '🏆 Perfeito! Você mandou muito bem!';
-            } else if (score >= 8) {
-                message = '🎉 Excelente resultado!';
-            } else if (score >= 6) {
-                message = '👍 Bom trabalho! Continue praticando.';
-            } else if (score >= 4) {
-                message = '😊 Mais ou menos... Tente de novo!';
-            } else {
-                message = '💪 Não desanime! Pratique mais que você melhora.';
-            }
+            if (score === 10) message = '🏆 Perfeito! Você mandou muito bem!';
+            else if (score >= 8) message = '🎉 Excelente resultado!';
+            else if (score >= 6) message = '👍 Bom trabalho! Continue praticando.';
+            else if (score >= 4) message = '😊 Mais ou menos... Tente de novo!';
+            else message = '💪 Não desanime! Pratique mais que você melhora.';
 
             document.getElementById('result-message').textContent = message;
         }
