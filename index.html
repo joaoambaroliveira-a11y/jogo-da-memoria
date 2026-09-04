@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Matemática</title>
+    <title>Jogo de Matemática - Disputa</title>
     <style>
         * {
             margin: 0;
@@ -121,18 +121,24 @@
             background: white;
             color: #1e3a8a;
             border: none;
-            padding: 15px 28px;
+            padding: 14px 26px;
             border-radius: 50px;
             font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
-            margin: 8px 5px;
+            margin: 6px 4px;
         }
 
         .btn:hover {
             transform: scale(1.05);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secundario {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
         }
 
         .btn-dificuldade {
@@ -168,22 +174,22 @@
         .final-score {
             font-size: 3.2rem;
             font-weight: 800;
-            margin: 10px 0;
+            margin: 10px 0 0;
         }
 
         .tempo-final {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin: 15px 0;
+            margin: 12px 0;
             background: rgba(0,0,0,0.25);
             display: inline-block;
-            padding: 10px 25px;
+            padding: 10px 22px;
             border-radius: 14px;
         }
 
         .result-message {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
+            font-size: 1.15rem;
+            margin: 15px 0 20px;
             opacity: 0.95;
         }
 
@@ -203,6 +209,118 @@
             margin-bottom: 8px;
         }
 
+        .input-nome {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.25);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 12px 0 18px;
+            outline: none;
+        }
+
+        .input-nome::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .input-nome:focus {
+            border-color: #60a5fa;
+        }
+
+        .jogador-atual {
+            background: rgba(0,0,0,0.3);
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .ranking-lista {
+            text-align: left;
+            max-height: 320px;
+            overflow-y: auto;
+            margin: 15px 0 20px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .ranking-item.top1 {
+            background: linear-gradient(90deg, rgba(251,191,36,0.35), rgba(0,0,0,0.25));
+            border: 1px solid rgba(251,191,36,0.5);
+        }
+
+        .ranking-item.top2 {
+            background: linear-gradient(90deg, rgba(156,163,175,0.3), rgba(0,0,0,0.25));
+        }
+
+        .ranking-item.top3 {
+            background: linear-gradient(90deg, rgba(180,83,9,0.3), rgba(0,0,0,0.25));
+        }
+
+        .ranking-pos {
+            font-size: 1.2rem;
+            font-weight: 800;
+            width: 32px;
+            text-align: center;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-nome {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .ranking-detalhes {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .ranking-vazio {
+            opacity: 0.7;
+            padding: 30px 10px;
+            font-size: 1.05rem;
+        }
+
+        .filtros-ranking {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filtro-btn.ativo {
+            background: white;
+            color: #1e3a8a;
+        }
+
         @media (max-width: 480px) {
             .container { padding: 28px 18px; }
             .question { font-size: 1.9rem; }
@@ -213,10 +331,25 @@
 <body>
     <div class="container">
 
-        <!-- Tela Inicial -->
-        <div id="start-screen">
-            <h1>🧮 Jogo de Matemática</h1>
-            <p class="subtitle">Escolha o nível e veja quanto tempo você leva!</p>
+        <!-- Tela Nome -->
+        <div id="nome-screen">
+            <h1>🧮 Disputa de Matemática</h1>
+            <p class="subtitle">Digite seu nome para entrar na disputa!</p>
+
+            <input type="text" class="input-nome" id="input-nome-inicio" placeholder="Seu nome" maxlength="15">
+
+            <button class="btn" style="width:100%;" onclick="irParaNiveis()">Continuar</button>
+
+            <button class="btn btn-secundario" style="margin-top:15px; width:100%;" onclick="mostrarRanking()">
+                🏆 Ver Ranking
+            </button>
+        </div>
+
+        <!-- Tela Níveis -->
+        <div id="start-screen" class="hidden">
+            <h1>🧮 Escolha o Nível</h1>
+            <div class="jogador-atual" id="jogador-nome">Jogador: —</div>
+            <p class="subtitle">Quem termina mais rápido vence!</p>
 
             <button class="btn-dificuldade btn-facil" onclick="startGame('facil')">
                 🟢 Fácil
@@ -232,10 +365,15 @@
                 🔴 Difícil
                 <div class="descricao-nivel">Números grandes • Multiplicação e Divisão</div>
             </button>
+
+            <button class="btn btn-secundario" style="margin-top:15px; width:100%;" onclick="voltarParaNome()">
+                Trocar nome
+            </button>
         </div>
 
         <!-- Tela do Jogo -->
         <div id="game-screen" class="hidden">
+            <div class="jogador-atual" id="jogador-jogo">Jogador: —</div>
             <div class="nivel-atual" id="nivel-texto">Nível: Médio</div>
 
             <div class="score-board">
@@ -243,7 +381,6 @@
                 <div>Pontos: <span id="score">0</span></div>
             </div>
 
-            <!-- CRONÔMETRO -->
             <div class="timer-box">
                 ⏱️ <span id="timer">00:00</span>
             </div>
@@ -256,6 +393,7 @@
         <!-- Tela Final -->
         <div id="end-screen" class="hidden">
             <h1>Fim de Jogo!</h1>
+            <div class="jogador-atual" id="jogador-final">Jogador: —</div>
             <div class="nivel-atual" id="nivel-final">Nível: Médio</div>
             
             <div class="final-score" id="final-score">0</div>
@@ -266,9 +404,35 @@
             </div>
 
             <p class="result-message" id="result-message"></p>
-            
-            <button class="btn" onclick="voltarInicio()">Escolher outro nível</button>
-            <button class="btn" onclick="jogarNovamente()">Jogar novamente</button>
+
+            <div>
+                <button class="btn" onclick="salvarRanking()">💾 Salvar no Ranking</button>
+            </div>
+            <div style="margin-top:10px;">
+                <button class="btn btn-secundario" onclick="mostrarRanking()">🏆 Ver Ranking</button>
+                <button class="btn btn-secundario" onclick="jogarNovamente()">Jogar novamente</button>
+            </div>
+            <div style="margin-top:8px;">
+                <button class="btn btn-secundario" onclick="voltarInicio()">Escolher outro nível</button>
+            </div>
+        </div>
+
+        <!-- Tela Ranking -->
+        <div id="ranking-screen" class="hidden">
+            <h1>🏆 Ranking</h1>
+            <p class="subtitle">Quem fez em menos tempo</p>
+
+            <div class="filtros-ranking">
+                <button class="filtro-btn ativo" id="filtro-todos" onclick="filtrarRanking('todos')">Todos</button>
+                <button class="filtro-btn" id="filtro-facil" onclick="filtrarRanking('facil')">Fácil</button>
+                <button class="filtro-btn" id="filtro-medio" onclick="filtrarRanking('medio')">Médio</button>
+                <button class="filtro-btn" id="filtro-dificil" onclick="filtrarRanking('dificil')">Difícil</button>
+            </div>
+
+            <div class="ranking-lista" id="ranking-lista"></div>
+
+            <button class="btn" onclick="voltarParaNome()">Voltar</button>
+            <button class="btn btn-secundario" onclick="limparRanking()">Limpar ranking</button>
         </div>
     </div>
 
@@ -279,6 +443,8 @@
         let dificuldade = 'medio';
         let segundos = 0;
         let timerInterval = null;
+        let filtroAtual = 'todos';
+        let nomeJogador = '';
         const totalQuestions = 10;
 
         const nomesNivel = {
@@ -293,6 +459,28 @@
             return (min < 10 ? '0' + min : min) + ':' + (s < 10 ? '0' + s : s);
         }
 
+        function irParaNiveis() {
+            const nome = document.getElementById('input-nome-inicio').value.trim();
+            if (!nome) {
+                alert('Digite seu nome para entrar na disputa!');
+                document.getElementById('input-nome-inicio').focus();
+                return;
+            }
+            nomeJogador = nome;
+            document.getElementById('jogador-nome').textContent = 'Jogador: ' + nomeJogador;
+            document.getElementById('nome-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function voltarParaNome() {
+            pararTimer();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('ranking-screen').classList.add('hidden');
+            document.getElementById('nome-screen').classList.remove('hidden');
+        }
+
         function startGame(nivel) {
             dificuldade = nivel;
             score = 0;
@@ -301,13 +489,14 @@
 
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('ranking-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
             document.getElementById('score').textContent = score;
             document.getElementById('nivel-texto').textContent = 'Nível: ' + nomesNivel[dificuldade];
+            document.getElementById('jogador-jogo').textContent = 'Jogador: ' + nomeJogador;
             document.getElementById('timer').textContent = '00:00';
 
-            // Inicia o cronômetro
             pararTimer();
             timerInterval = setInterval(() => {
                 segundos++;
@@ -325,7 +514,9 @@
             pararTimer();
             document.getElementById('end-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('ranking-screen').classList.add('hidden');
             document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('jogador-nome').textContent = 'Jogador: ' + nomeJogador;
         }
 
         function pararTimer() {
@@ -349,7 +540,6 @@
             document.getElementById('question-text').textContent = question.text;
             correctAnswer = question.answer;
 
-            // Gera opções
             let options = [correctAnswer];
             while (options.length < 4) {
                 let wrong = correctAnswer + Math.floor(Math.random() * 17) - 8;
@@ -474,28 +664,131 @@
 
             document.getElementById('final-score').textContent = score;
             document.getElementById('nivel-final').textContent = 'Nível: ' + nomesNivel[dificuldade];
+            document.getElementById('jogador-final').textContent = 'Jogador: ' + nomeJogador;
             document.getElementById('tempo-final').textContent = formatarTempo(segundos);
 
             let message = '';
-            if (score === 10) {
-                message = '🏆 Perfeito! Você mandou muito bem!';
-            } else if (score >= 8) {
-                message = '🎉 Excelente resultado!';
-            } else if (score >= 6) {
-                message = '👍 Bom trabalho! Continue praticando.';
-            } else if (score >= 4) {
-                message = '😊 Mais ou menos... Tente de novo!';
-            } else {
-                message = '💪 Não desanime! Pratique mais que você melhora.';
-            }
+            if (score === 10) message = '🏆 Perfeito! Você mandou muito bem!';
+            else if (score >= 8) message = '🎉 Excelente resultado!';
+            else if (score >= 6) message = '👍 Bom trabalho! Continue praticando.';
+            else if (score >= 4) message = '😊 Mais ou menos... Tente de novo!';
+            else message = '💪 Não desanime! Pratique mais que você melhora.';
 
-            if (segundos < 60) {
-                message += ' Tempo ótimo!';
-            } else if (segundos < 90) {
-                message += ' Bom tempo!';
-            }
+            if (segundos < 45) message += ' Tempo incrível!';
+            else if (segundos < 70) message += ' Bom tempo!';
 
             document.getElementById('result-message').textContent = message;
+        }
+
+        // ========== RANKING ==========
+        function getRanking() {
+            const dados = localStorage.getItem('rankingMatematica');
+            return dados ? JSON.parse(dados) : [];
+        }
+
+        function salvarRanking() {
+            if (!nomeJogador) {
+                alert('Nome não encontrado. Volte e digite seu nome.');
+                return;
+            }
+
+            const ranking = getRanking();
+
+            ranking.push({
+                nome: nomeJogador,
+                score: score,
+                tempo: segundos,
+                dificuldade: dificuldade,
+                data: new Date().toLocaleDateString('pt-BR')
+            });
+
+            ranking.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.tempo - b.tempo;
+            });
+
+            if (ranking.length > 50) ranking.length = 50;
+
+            localStorage.setItem('rankingMatematica', JSON.stringify(ranking));
+
+            alert('Resultado de ' + nomeJogador + ' salvo no ranking! 🏆');
+            mostrarRanking();
+        }
+
+        function filtrarRanking(filtro) {
+            filtroAtual = filtro;
+            document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('ativo'));
+            document.getElementById('filtro-' + filtro).classList.add('ativo');
+            renderizarRanking();
+        }
+
+        function mostrarRanking() {
+            pararTimer();
+            document.getElementById('nome-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('ranking-screen').classList.remove('hidden');
+
+            filtroAtual = 'todos';
+            document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('ativo'));
+            document.getElementById('filtro-todos').classList.add('ativo');
+
+            renderizarRanking();
+        }
+
+        function renderizarRanking() {
+            let ranking = getRanking();
+
+            if (filtroAtual !== 'todos') {
+                ranking = ranking.filter(r => r.dificuldade === filtroAtual);
+            }
+
+            ranking.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.tempo - b.tempo;
+            });
+
+            const lista = document.getElementById('ranking-lista');
+
+            if (ranking.length === 0) {
+                lista.innerHTML = '<div class="ranking-vazio">Nenhum resultado ainda.<br>Seja o primeiro da disputa!</div>';
+                return;
+            }
+
+            const top = ranking.slice(0, 15);
+            let html = '';
+
+            top.forEach((item, index) => {
+                const pos = index + 1;
+                let classe = '';
+                let medalha = pos + 'º';
+
+                if (pos === 1) { classe = 'top1'; medalha = '🥇'; }
+                else if (pos === 2) { classe = 'top2'; medalha = '🥈'; }
+                else if (pos === 3) { classe = 'top3'; medalha = '🥉'; }
+
+                html += `
+                    <div class="ranking-item ${classe}">
+                        <div class="ranking-pos">${medalha}</div>
+                        <div class="ranking-info">
+                            <div class="ranking-nome">${item.nome}</div>
+                            <div class="ranking-detalhes">
+                                ${item.score}/10 pts • ⏱️ ${formatarTempo(item.tempo)} • ${nomesNivel[item.dificuldade]}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            lista.innerHTML = html;
+        }
+
+        function limparRanking() {
+            if (confirm('Tem certeza que deseja apagar todo o ranking?')) {
+                localStorage.removeItem('rankingMatematica');
+                renderizarRanking();
+            }
         }
     </script>
 </body>
