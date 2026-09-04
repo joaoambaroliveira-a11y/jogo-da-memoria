@@ -321,6 +321,44 @@
             color: #1e3a8a;
         }
 
+        .sucesso-box {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin: 10px 0 20px;
+            animation: aparecer 0.4s ease;
+        }
+
+        @keyframes aparecer {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .sucesso-icone {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .sucesso-titulo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #86efac;
+        }
+
+        .sucesso-texto {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 6px;
+        }
+
+        .sucesso-detalhe {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-top: 10px;
+        }
+
         @media (max-width: 480px) {
             .container { padding: 28px 18px; }
             .question { font-size: 1.9rem; }
@@ -417,6 +455,22 @@
             </div>
         </div>
 
+        <!-- Tela Sucesso ao Salvar -->
+        <div id="sucesso-screen" class="hidden">
+            <div class="sucesso-box">
+                <div class="sucesso-icone">🏆</div>
+                <div class="sucesso-titulo">Salvo no Ranking!</div>
+                <div class="sucesso-texto" id="sucesso-nome">Parabéns!</div>
+                <div class="sucesso-detalhe" id="sucesso-detalhe">10/10 pts • 00:45</div>
+            </div>
+
+            <button class="btn" onclick="mostrarRanking()">Ver Ranking</button>
+            <button class="btn btn-secundario" onclick="jogarNovamente()">Jogar novamente</button>
+            <div style="margin-top:8px;">
+                <button class="btn btn-secundario" onclick="voltarInicio()">Escolher outro nível</button>
+            </div>
+        </div>
+
         <!-- Tela Ranking -->
         <div id="ranking-screen" class="hidden">
             <h1>🏆 Ranking</h1>
@@ -477,6 +531,7 @@
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('sucesso-screen').classList.add('hidden');
             document.getElementById('ranking-screen').classList.add('hidden');
             document.getElementById('nome-screen').classList.remove('hidden');
         }
@@ -489,6 +544,7 @@
 
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('sucesso-screen').classList.add('hidden');
             document.getElementById('ranking-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
@@ -513,6 +569,7 @@
         function voltarInicio() {
             pararTimer();
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('sucesso-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('ranking-screen').classList.add('hidden');
             document.getElementById('start-screen').classList.remove('hidden');
@@ -711,8 +768,13 @@
 
             localStorage.setItem('rankingMatematica', JSON.stringify(ranking));
 
-            alert('Resultado de ' + nomeJogador + ' salvo no ranking! 🏆');
-            mostrarRanking();
+            // Tela de sucesso destacada
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('sucesso-screen').classList.remove('hidden');
+
+            document.getElementById('sucesso-nome').textContent = 'Parabéns, ' + nomeJogador + '!';
+            document.getElementById('sucesso-detalhe').textContent =
+                score + '/10 pts • ⏱️ ' + formatarTempo(segundos) + ' • ' + nomesNivel[dificuldade];
         }
 
         function filtrarRanking(filtro) {
@@ -728,6 +790,7 @@
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('sucesso-screen').classList.add('hidden');
             document.getElementById('ranking-screen').classList.remove('hidden');
 
             filtroAtual = 'todos';
